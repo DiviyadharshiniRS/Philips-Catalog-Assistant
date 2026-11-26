@@ -1,0 +1,133 @@
+
+
+============================================================
+POLICY: data-ownership-policy
+============================================================
+Data Ownership Policy
+Applies to: CircuitNova and HearthwellOwner: Group Master Data OfficeVersion: 1.0, effective 2025-01-01 
+1. Purpose
+The same product appears in several lists kept by different teams. When the lists disagree, this policy decides which list is right (the "source of truth").
+2. Source of truth per topic
+Topic | Source of truth | Kept by
+Which products and options exist, product names | products | Product team
+Business unit | products | Product team
+Export class, country of origin | products | Product team
+Where and from when sales may offer it, service | where_we_sell | Sales team
+Owner company, validity dates | product_validity | Admin / ERP team
+Cost price, list price | price_list | Pricing team
+Third-party parts and their status | third_party_parts | Purchasing team
+3. Every product must be in every system
+3.1 Every product in products must also appear in where_we_sell and in product_validity.
+3.2 A product missing from either list is a master data gap and must be created in the missing system.
+4. Conflicting values
+4.1 If two lists disagree on a topic, the value in the source of truth wins, and the other list must be corrected.
+4.2 Example: if product_validity shows a different business_unit than products, the products value is correct and product_validity must be updated.
+5. Reporting data problems
+5.1 Every data problem report must name the product or option IDs affected, the lists involved, and which value is correct according to section 2.
+
+
+============================================================
+POLICY: export-control-policy
+============================================================
+Export Control Policy
+Applies to: CircuitNova and HearthwellOwner: Group Trade ComplianceVersion: 3.0, effective 2026-01-01 
+1. Purpose
+Some products contain technology (for example encryption or high-performance electronics) that governments control. This policy says where such items may be sold.
+2. What counts as controlled
+2.1 Every product has an export class in the export_class column of products. The class is the same on all rows of a product, including its options.
+2.2 The classes are:
+Class | Meaning | Where it may be sold
+EC-0 | Not controlled | Anywhere
+EC-1 | Controlled (mass-market technology) | Anywhere except the embargoed countries in section 3
+EC-2 | Controlled (strong encryption) | Inside the EU; anywhere else needs an export licence (section 4). Never in embargoed countries
+2.3 EC-1 and EC-2 items are controlled. EC-0 items are not.
+3. Embargoed countries
+3.1 Controlled items must never be quotable in these embargoed countries:
+Code | Country
+CU | Cuba
+IR | Iran
+KP | North Korea
+SY | Syria
+RU | Russia
+BY | Belarus
+3.2 If a controlled product is quotable in any embargoed country (in products or in where_we_sell), that is a compliance violation and must be removed immediately.
+4. Items that need a licence
+4.1 EC-2 items need an export licence for any country outside the European Union.
+4.2 EU countries: AT, BE, BG, HR, CY, CZ, DK, EE, FI, FR, DE, GR, HU, IE, IT, LV, LT, LU, MT, NL, PL, PT, RO, SK, SI, ES, SE.
+4.3 Sales must check that a licence exists before quoting an EC-2 item outside the EU.
+
+
+============================================================
+POLICY: pricing-policy
+============================================================
+Pricing Policy
+Applies to: CircuitNova and HearthwellOwner: Group Pricing TeamVersion: 3.2, effective 2026-01-01 
+1. Purpose
+This policy sets the rules every price in the price_list must follow before sales may use it in a quote. A price that breaks any rule below is not quotable until it is fixed.
+2. Every priced option needs a price
+2.1 If where_we_sell marks an option with has_price = Yes, the price_list must contain at least one row for that option.
+2.2 An option marked has_price = Yes with no row in the price_list is a pricing gap and must be reported to the Pricing Team.
+3. Missing prices
+3.1 A price row with status Cost and list price missing is not quotable.
+3.2 Exception for new products: if the row has is_npi = Yes (new product introduction), a missing price is allowed while the product launches. It doesn't count as a violation, but it should be listed separately as "NPI, price pending".
+3.3 For all other rows (is_npi = No), a missing price is a violation.
+4. Refreshing list prices
+4.1 A row with status List price not refreshed means the cost price was updated after the list price. Such a row must not be quoted until the Pricing Team refreshes the list price.
+5. Minimum margin
+5.1 The list_price must be at least 1.2 times the cost_price (a minimum margin of 20%).
+5.2 Rows where the list price is equal to the cost price and above 0 (zero margin) are treated as a serious violation and must be escalated to the business unit's pricing manager.
+5.3 Free items: a row where both the cost price and the list price are 0 is an item included free of charge. Free items are allowed and are not margin violations.
+5.4 Rows with a missing cost or list price are covered by section 3, not by this section.
+6. Currency
+6.1 Every row with status Available must have a currency. An available price without a currency can't be quoted, because the customer would not know what they are paying.
+7. Reporting
+Pricing violations are reported per business unit and per region, with the number of affected rows and option IDs.
+
+
+============================================================
+POLICY: product-lifecycle-policy
+============================================================
+Product Lifecycle Policy
+Applies to: CircuitNova and HearthwellOwner: Group Product ManagementVersion: 2.1, effective 2025-10-01 
+1. Purpose
+Products and parts have a life: they are introduced, sold, and eventually retired. This policy says what may still be sold at each stage.
+2. Validity
+2.1 The product_validity sheet holds each item's valid_from and valid_to dates.
+2.2 An item is expired when its valid_to date is before today.
+2.3 A valid_to far in the future (such as 9999-12-31) means the item has no planned end date.
+3. Expired items must not be sold
+3.1 An expired item must not appear in where_we_sell. If it does, that is a lifecycle violation: sales could still quote a product the company no longer supports.
+3.2 Lifecycle violations are reported per product, with the expiry date.
+4. Obsolete third-party parts
+4.1 A third-party part with catalog_status = Obsolete is no longer supplied.
+4.2 Any product that uses an obsolete part (through linked_product_id) must be reviewed before it is sold again. If such a product is still in where_we_sell, it must be flagged "at risk: obsolete part".
+5. Parts not found in the catalog
+5.1 A third-party part with catalog_status = Not found in catalog points to a product that doesn't exist in products.
+5.2 These parts must be reported to Purchasing so the link can be corrected or the part removed.
+6. New product introductions (NPI)
+6.1 NPI items (is_npi = Yes in price_list) are newly launched. See the Pricing Policy, section 3.2, for how missing prices on NPI items are handled.
+
+
+============================================================
+POLICY: service-policy
+============================================================
+Service Policy
+Applies to: CircuitNova and HearthwellOwner: Group Service OperationsVersion: 1.4, effective 2026-03-01 
+1. Purpose
+This policy describes the service plans and where service may be sold.
+2. Serviceable and non-serviceable items
+2.1 In where_we_sell, serviceability = Serviceable means a service plan can be sold with the item.
+2.2 Every serviceable item must have a service_plan and a list of serviceable_countries.
+2.3 Non-serviceable items must not have a service plan.
+3. Service plans
+Plans are numbered SVC-01 to SVC-18 and fall into three tiers:
+Plans | Tier | What's included | Duration
+SVC-01 to SVC-06 | Basic | Replacement parts only, customer ships the item in | 1 year
+SVC-07 to SVC-12 | Standard | Parts and labour, on-site visit within 5 working days | 2 years
+SVC-13 to SVC-18 | Premium | Parts and labour, on-site within 24 hours, 24/7 phone support | 3 years
+4. Where service may be sold
+4.1 A service plan may only be sold in the countries listed in serviceable_countries.
+4.2 If a serviceable item is quotable in a country where no service is offered, sales must quote it without a service plan in that country and tell the customer.
+4.3 Note: serviceable_countries and quotable_countries both list countries separated by ; (AT;BE;DE).
+5. Expired or obsolete items
+5.1 No new service plans may be sold for items that are expired (see the Product Lifecycle Policy).
